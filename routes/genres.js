@@ -1,5 +1,17 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Joi = require("joi");
+
+mongoose
+  .connect("mongodb://localhost/vidly")
+  .then(() => console.log("Connected to MongoDb"))
+  .catch((err) => console.error(err.message));
+
+const genreSchema = new mongoose.Schema({
+  name: { type: String, required: true, minLength: 3 },
+});
+
+const Genre = mongoose.model("Genre", genreSchema);
 
 const router = express.Router();
 
