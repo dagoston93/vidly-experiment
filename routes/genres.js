@@ -2,110 +2,76 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-mongoose
-  .connect("mongodb://localhost/vidly")
-  .then(() => console.log("Connected to MongoDb"))
-  .catch((err) => console.error(err.message));
-
 const genreSchema = new mongoose.Schema({
-  name: { type: String, required: true, minLength: 3 },
+  name: { type: String, required: true, minlength: 3, maxlength: 50 },
 });
 
 const Genre = mongoose.model("Genre", genreSchema);
 
 const router = express.Router();
 
-async function getGenres() {
-  const genres = await Genre.find();
-  return genres;
-}
+router.get("/", async (req, res) => {
+  const genres = await Genre.find().sort("name");
+  res.send(genres);
+});
 
-async function getGenre(id) {
-  try {
-    const genre = await Genre.findById(id);
-    return genre;
-  } catch {
-    return null;
+router.get("/:id", async (req, res) => {
+  const genre = await Genre.findById(req.params.id);
+
+  if (!genre) {
+    res.status(404).send("The genre with the given ID was not found.");
+    return;
   }
-}
-
-async function saveGenre(genre) {
-  return await genre.save();
-}
-
-async function deleteGenre(id) {
-  return await Genre.findByIdAndDelete(id);
-}
-
-router.get("/", (req, res) => {
-  getGenres().then((genres) => res.send(genres));
+  res.send(genre);
 });
 
-router.get("/:id", (req, res) => {
-  getGenre(req.params.id).then((genre) => {
-    if (!genre) {
-      res.status(404).send("The genre with the given ID was not found.");
-      return;
-    }
-    res.send(genre);
-  });
-});
-
-// Testing: https://web.postman.co/workspace (Postman Desktop Agent must be running...)
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const { error } = validateGenre(req.body);
   if (error) {
     // 400 Bad Request
     res.status(400).send(error.details[0].message);
     return;
   }
-  const genre = new Genre({
+
+  let genre = new Genre({
     name: req.body.name,
   });
 
-  try {
-    saveGenre(genre).then((genre) => res.send(genre));
-  } catch (ex) {
-    res.status(400).send(ex.message);
+  genre = await genre.save();
+  res.send(genre);
+});
+
+router.put("/:id", async (req, res) => {
+  const { error } = validateGenre(req.body);
+  if (error) {
+    // 400 Bad Request
+    res.status(400).send(error.details[0].message);
+    return;
   }
+
+  const genre = await Genre.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name },
+    { new: true }
+  );
+
+  if (!genre) {
+    res.status(404).send("The genre with the given ID was not found.");
+    return;
+  }
+
+  res.send(genre);
 });
 
-router.put("/:id", (req, res) => {
-  getGenre(req.params.id).then((genre) => {
-    if (!genre) {
-      res.status(404).send("The genre with the given ID was not found.");
-      return;
-    }
+router.delete("/:id", async (req, res) => {
+  const genre = await Genre.findByIdAndDelete(req.params.id);
 
-    const { error } = validateGenre(req.body);
-    if (error) {
-      // 400 Bad Request
-      res.status(400).send(error.details[0].message);
-      return;
-    }
+  if (!genre) {
+    res.status(404).send("The genre with the given ID was not found.");
+    return;
+  }
 
-    try {
-      genre.name = req.body.name;
-      saveGenre(genre).then((genre) => res.send(genre));
-    } catch (ex) {
-      res.status(400).send(ex.message);
-    }
-  });
-});
-
-router.delete("/:id", (req, res) => {
-  deleteGenre(req.params.id)
-    .then((genre) => {
-      if (!genre) {
-        res.status(404).send("The genre with the given ID was not found.");
-        return;
-      }
-
-      res.send(genre);
-    })
-    .catch(() =>
-      res.status(404).send("The genre with the given ID was not found.")
-    );
+  res.send(genre);
 });
 
 function validateGenre(genre) {
