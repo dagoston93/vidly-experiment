@@ -50,19 +50,20 @@ router.get("/:id", (req, res) => {
 // Testing: https://web.postman.co/workspace (Postman Desktop Agent must be running...)
 router.post("/", (req, res) => {
   const { error } = validateGenre(req.body);
-
   if (error) {
     // 400 Bad Request
     res.status(400).send(error.details[0].message);
     return;
   }
-
-  const genre = {
-    id: genres.length + 1,
+const genre = new Genre({
     name: req.body.name,
-  };
-  genres.push(genre);
-  res.send(genre);
+  });
+
+  try {
+    saveGenre(genre).then((genre) => res.send(genre));
+  } catch (ex) {
+    res.status(400).send(ex.message);
+  }
 });
 
 router.put("/:id", (req, res) => {
