@@ -15,33 +15,36 @@ const Genre = mongoose.model("Genre", genreSchema);
 
 const router = express.Router();
 
-const genres = [
-  {
-    id: 1,
-    name: "Action",
-  },
-  {
-    id: 2,
-    name: "Sci-Fi",
-  },
-  {
-    id: 3,
-    name: "Documentary",
-  },
-];
+async function getGenres() {
+  const genres = await Genre.find();
+  return genres;
+}
+
+async function getGenre(id) {
+  try {
+    const genre = await Genre.find({ _id: id });
+    return genre;
+  } catch {
+    return null;
+  }
+}
+
+async function saveGenre(genre) {
+  return await genre.save();
+}
 
 router.get("/", (req, res) => {
-  res.send(genres);
+  getGenres().then((genres) => res.send(genres));
 });
 
 router.get("/:id", (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
+  getGenre(req.params.id).then((genre) => {
   if (!genre) {
     res.status(404).send("The genre with the given ID was not found.");
     return;
   }
-
   res.send(genre);
+});
 });
 
 // Testing: https://web.postman.co/workspace (Postman Desktop Agent must be running...)
