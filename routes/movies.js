@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
     dailyRentalRate: req.body.dailyRentalRate,
   });
 
-  movie = await movie.save();
+  await movie.save();
   res.send(movie);
 });
 
