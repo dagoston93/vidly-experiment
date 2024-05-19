@@ -3,6 +3,7 @@ const { Movie } = require("../models/movie");
 const { Customer } = require("../models/customer");
 const mongoose = require("mongoose");
 const express = require("express");
+const assert = require("assert");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -36,12 +37,25 @@ router.post("/", async (req, res) => {
       dailyRentalRate: movie.dailyRentalRate,
     },
   });
-  rental = await rental.save();
 
-  movie.numberInStock--;
-  movie.save();
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-  res.send(rental);
+    rental = await rental.save();
+    assert.ok(session);
+
+    movie.numberInStock--;
+    movie.save();
+    assert.ok(session);
+
+    session.commitTransaction();
+    session.endSession();
+
+    res.send(rental);
+  } catch (ex) {
+    res.status(500).send("Something went wrong..." + ex);
+  }
 });
 
 router.get("/:id", async (req, res) => {
