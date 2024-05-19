@@ -1,10 +1,11 @@
 const express = require("express");
 const { Movie, validate } = require("../models/movie");
+const { Genre } = require("../models/genre");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const movies = await Movie.find().sort("name");
+  const movies = await Movie.find().sort("title");
   res.send(movies);
 });
 
@@ -26,9 +27,15 @@ router.post("/", async (req, res) => {
     return;
   }
 
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send("Invalid genre ID.");
+
   let movie = new Movie({
     title: req.body.title,
-    genre: req.body.genre,
+    genre: {
+      _id: genre.id,
+      name: genre.name,
+    },
     numberInStock: req.body.numberInStock,
     dailyRentalRate: req.body.dailyRentalRate,
   });
@@ -45,11 +52,17 @@ router.put("/:id", async (req, res) => {
     return;
   }
 
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send("Invalid genre ID.");
+
   const movie = await Movie.findByIdAndUpdate(
     req.params.id,
     {
       title: req.body.title,
-      genre: req.body.genre,
+      genre: {
+        _id: genre.id,
+        name: genre.name,
+      },
       numberInStock: req.body.numberInStock,
       dailyRentalRate: req.body.dailyRentalRate,
     },
