@@ -5,6 +5,11 @@ const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const router = express.Router();
 
+router.get("/me", auth, async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password");
+  res.send(user);
+});
+
 router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
