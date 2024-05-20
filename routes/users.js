@@ -2,10 +2,10 @@ const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const express = require("express");
 const { User, validate } = require("../models/user");
-
+const auth = require("../middleware/auth");
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     // 400 Bad Request
