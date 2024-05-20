@@ -20,8 +20,7 @@ module.exports = function () {
 
   winston.add(
     new winston.transports.Console({
-      colorize: true,
-      prettyPrint: true,
+      format: winston.format.simple(),
       handleExceptions: true,
       handleRejections: true,
     })
