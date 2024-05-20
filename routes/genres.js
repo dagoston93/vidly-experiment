@@ -5,9 +5,13 @@ const { Genre, validate } = require("../models/genre");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const genres = await Genre.find().sort("name");
-  res.send(genres);
+router.get("/", async (req, res, next) => {
+  try {
+    const genres = await Genre.find().sort("name");
+    res.send(genres);
+  } catch (ex) {
+    next(ex);
+  }
 });
 
 router.get("/:id", async (req, res) => {

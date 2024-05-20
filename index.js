@@ -11,6 +11,8 @@ const rentals = require("./routes/rentals");
 const users = require("./routes/users");
 const auth = require("./routes/auth");
 
+const error = require("./middleware/error");
+
 if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined...");
   process.exit(1);
@@ -31,6 +33,9 @@ app.use("/api/movies", movies);
 app.use("/api/rentals", rentals);
 app.use("/api/users", users);
 app.use("/api/auth", auth);
+
+// Add error middleware LAST
+app.use(error);
 
 app.get("/", (req, res) => {
   res.send("Vidly!");
