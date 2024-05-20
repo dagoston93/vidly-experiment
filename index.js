@@ -1,5 +1,6 @@
 require("express-async-errors");
 const winston = require("winston");
+require("winston-mongodb");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
@@ -18,6 +19,13 @@ const error = require("./middleware/error");
 winston.add(
   new winston.transports.File({
     filename: "logfile.log",
+  })
+);
+
+winston.add(
+  new winston.transports.MongoDB({
+    db: "mongodb://localhost/vidly",
+    level: "error",
   })
 );
 
