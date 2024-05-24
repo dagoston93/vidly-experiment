@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose --runInBand",
+    "test": "jest --verbose --runInBand --coverage",
     "start": "set PORT=5000 && nodemon index.js"
   },
   "keywords": [],
