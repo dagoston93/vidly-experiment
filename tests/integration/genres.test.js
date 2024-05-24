@@ -1,5 +1,6 @@
 const request = require("supertest");
 const { Genre } = require("../../models/genre");
+const { User } = require("../../models/user");
 
 let server;
 
@@ -13,7 +14,7 @@ describe("/api/genres", () => {
     await Genre.deleteMany({});
   });
 
-  describe("GET/", () => {
+  describe("GET /", () => {
     it("should return all genres", async () => {
       await Genre.insertMany([{ name: "genre1" }, { name: "genre2" }]);
       const res = await request(server).get("/api/genres");
@@ -25,7 +26,7 @@ describe("/api/genres", () => {
     });
   });
 
-  describe("GET/:id", () => {
+  describe("GET /:id", () => {
     it("should return a genre if a valid ID given", async () => {
       const genre = new Genre({
         name: "genre1",
@@ -42,6 +43,47 @@ describe("/api/genres", () => {
       const res = await request(server).get("/api/genres/1");
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe("POST /", () => {
+    it("should return 401 if client is not logged in", async () => {
+      const res = await request(server).post("/api/genres", { name: "genre1" });
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 if genre name is less than 3 chars", async () => {
+      const token = new User().generateAuthToken();
+      const res = await request(server)
+        .post("/api/genres")
+        .set("x-auth-token", token)
+        .send({ name: "12" });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if genre name is more than 50 chars", async () => {
+      const token = new User().generateAuthToken();
+      const name = new Array(52).join("a");
+      const res = await request(server)
+        .post("/api/genres")
+        .set("x-auth-token", token)
+        .send({ name: name });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should save the genre if it is valid", async () => {
+      const token = new User().generateAuthToken();
+      const res = await request(server)
+        .post("/api/genres")
+        .set("x-auth-token", token)
+        .send({ name: "genre1" });
+
+      const genre = await Genre.findOne({ name: "genre1" });
+      expect(res.status).toBe(200);
+      expect(genre).not.toBeNull();
     });
   });
 });
