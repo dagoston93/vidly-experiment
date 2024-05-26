@@ -17,6 +17,8 @@ router.post("/", auth, async (req, res) => {
   if (!rental) return res.status(404).send("rental not found");
   if (rental.dateReturned) return res.status(400).send("rental processed.");
 
+  rental.dateReturned = Date.now();
+  await rental.save();
   res.status(200).send("");
 });
 
