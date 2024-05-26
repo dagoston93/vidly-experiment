@@ -135,4 +135,20 @@ describe("api/returns", () => {
 
     expect(movieInDb.numberInStock).toBe(11);
   });
+
+  it("should return the rental in the response if request.", async () => {
+    const res = await exec();
+
+    const rentalInDb = await Rental.findById(rental._id);
+
+    expect(Object.keys(res.body)).toEqual(
+      expect.arrayContaining([
+        "dateOut",
+        "dateReturned",
+        "rentalFee",
+        "customer",
+        "movie",
+      ])
+    );
+  });
 });

@@ -29,7 +29,7 @@ router.post("/", auth, async (req, res) => {
     { _id: rental.movie._id },
     { $inc: { numberInStock: 1 } }
   );
-  res.status(200).send("");
+  res.status(200).send(rental);
 });
 
 module.exports = router;
