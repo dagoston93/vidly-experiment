@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --verbose --runInBand --coverage",
+    "test-returns": "jest ./tests/integration/returns.test.js",
     "start": "set PORT=5000 && nodemon index.js"
   },
   "keywords": [],
