@@ -12,11 +12,12 @@ router.post("/", async (req, res) => {
   if (!req.body.movieId) return res.status(400).send("movieId needed");
 
   const rental = await Rental.findOne({
-    customerId: req.body.customerId,
-    movieId: req.body.movieId,
+    "customer._id": req.body.customerId,
+    "movie._id": req.body.movieId,
   });
 
   if (!rental) return res.status(404).send("rental not found");
+  if (rental.dateReturned) return res.status(400).send("rental processed.");
 });
 
 module.exports = router;
