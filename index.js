@@ -6,6 +6,7 @@ const initRoutes = require("./startup/routes");
 const initDatabase = require("./startup/database");
 const initLogging = require("./startup/logging");
 const initConfig = require("./startup/config");
+const prod = require("./startup/prod");
 
 const app = express();
 initLogging();
@@ -13,6 +14,7 @@ initConfig();
 initValidation();
 initDatabase();
 initRoutes(app);
+prod(app);
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
