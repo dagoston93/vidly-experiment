@@ -1,5 +1,7 @@
-const request = require("supertest");
 const { Rental } = require("../../models/rental");
+const { User } = require("../../models/user");
+
+const request = require("supertest");
 const mongoose = require("mongoose");
 
 describe("api/returns", () => {
@@ -8,10 +10,20 @@ describe("api/returns", () => {
   let customerId;
   let movieId;
 
+  let token;
+
+  const exec = async () => {
+    return await request(server)
+      .post("/api/returns")
+      .set("x-auth-token", token)
+      .send({ customerId, movieId });
+  };
+
   beforeEach(async () => {
     server = require("../../index");
     customerId = new mongoose.Types.ObjectId();
     movieId = new mongoose.Types.ObjectId();
+    token = new User().generateAuthToken();
 
     rental = new Rental({
       customer: {
@@ -34,8 +46,11 @@ describe("api/returns", () => {
     await Rental.deleteMany({});
   });
 
-  it("should work", async () => {
-    let x = await Rental.findById(rental._id);
-    console.log(x);
+  it("should return 401 if client is not logged in", async () => {
+    token = "";
+
+    const res = await exec();
+
+    expect(res.status).toBe(401);
   });
 });
