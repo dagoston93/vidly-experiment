@@ -6,13 +6,13 @@ require("express-async-errors");
 const db = config.get("db");
 
 module.exports = function () {
-  winston.add(
-    new winston.transports.File({
-      filename: "logfile.log",
-      handleExceptions: true,
-      handleRejections: true,
-    })
-  );
+  // winston.add(
+  //   new winston.transports.File({
+  //     filename: "logfile.log",
+  //     handleExceptions: true,
+  //     handleRejections: true,
+  //   })
+  // );
 
   // winston.add(
   //   new winston.transports.MongoDB({
@@ -21,13 +21,13 @@ module.exports = function () {
   //   })
   // );
 
-  if (!process.env.NODE_ENV || process.env.NODE_ENV !== "production") {
-    winston.add(
-      new winston.transports.Console({
-        format: winston.format.simple(),
-        handleExceptions: true,
-        handleRejections: true,
-      })
-    );
-  }
+  //if (!process.env.NODE_ENV || process.env.NODE_ENV !== "production") {
+  winston.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+      handleExceptions: true,
+      handleRejections: true,
+    })
+  );
+  //}
 };
