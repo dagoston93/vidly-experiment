@@ -1,0 +1,4 @@
+{
+    "jwtPrivateKey": "",
+    "db": "mongodb+srv://dagoston93:MyMongoDbPassword@agodb.hdszzdz.mongodb.net/?retryWrites=true&w=majority&appName=AgoDb"
+}
